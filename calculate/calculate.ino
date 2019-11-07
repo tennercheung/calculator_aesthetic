@@ -23,7 +23,7 @@ void setup() {
   */
   lc.shutdown(0, false);
   /* Set the brightness to a medium values */
-  lc.setIntensity(0, 5);
+  lc.setIntensity(0, 4);
   /* and clear the display */
   lc.clearDisplay(0);
 }
@@ -85,8 +85,9 @@ void printNumber(int v) {
 
   boolean negative;
 
-  if (v < -9999 || v > 9999)
+  if (v < -999999 || v > 999999) {
     return;
+  }
   if (v < 0) {
     negative = true;
     v = v * -1;
@@ -105,13 +106,15 @@ void printNumber(int v) {
   v = v / 10;
   millions = v;
 
-  if (negative) {
+  if (negative == true) {
     //print character '-' in the leftmost column
     lc.setChar(0, 7, '-', false);
   }
-  else {
+  else if (negative == false) {
     //print a blank in the sign column
+    //    lc.setChar(0, 7, ' ', false);
     lc.setChar(0, 7, ' ', false);
+
   }
   //Now print the number digit by digit
 
@@ -122,15 +125,18 @@ void printNumber(int v) {
   lc.setDigit(0, 2, (byte)hundreds, false);
   lc.setDigit(0, 1, (byte)tens, false);
   lc.setDigit(0, 0, (byte)ones, false);
+
 }
 
 
 void loop() {
   //  writeArduinoOn7Segment();
-  printNumber(12);
-//  delay(500);
-//  /* and clear the display */
-//  lc.clearDisplay(0);
-//  delay(500);
+
+
+  printNumber(12345);
+  //  delay(500);
+  //  /* and clear the display */
+  //  lc.clearDisplay(0);
+  //  delay(500);
   //  scrollDigits();
 }
