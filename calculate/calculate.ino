@@ -17,8 +17,8 @@
 #include <stdlib.h>
 
 // Globar Variables
-const byte ROWS = 4; 
-const byte COLS = 4; 
+const byte ROWS = 4;
+const byte COLS = 4;
 
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3', '+'},
@@ -27,21 +27,20 @@ char hexaKeys[ROWS][COLS] = {
   {'*', '0', '/', '='}
 };
 
-byte rowPins[ROWS] = {9, 8, 7, 6}; 
-byte colPins[COLS] = {5, 4, 3, 2}; 
+byte rowPins[ROWS] = {9, 8, 7, 6};
+byte colPins[COLS] = {5, 4, 3, 2};
 
-/* Char holder for the value*/
-char valueOne[8];
-char valueTwo[8];
-
+/* Holds the value for User inputs*/
+float numOne;
+//float numTwo;
 float total;
 
 /* operation */
-enum operation {+, -, *, /, =, CE} oper;
+//enum operation {+, -, *, /, =, CE} oper;
 
 /* boolean value if the value contains a decimal*/
 boolean hasDecimalOne = false;
-boolean hasDecimalTwo = false;
+//boolean hasDecimalTwo = false;
 
 /* number of digits for each value */
 int count1 = 0;
@@ -52,8 +51,8 @@ boolean hasOperator = false;
 
 /*///////////////////////////////////////////////////////////////////////////////*/
 
-Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
- 
+Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
+
 LedControl lc = LedControl(12, 11, 10, 1);
 
 /* we always wait a bit between updates of the display */
@@ -118,8 +117,8 @@ void setup() {
 //  delay(delaytime);
 //}
 
-void printNumber(float n) {
-  
+void printNumber(int v) {
+
   int ones;
   int tens;
   int hundreds;
@@ -138,10 +137,6 @@ void printNumber(float n) {
     v = v * -1;
   }
 
-  int v = (int) n;
-  float temp = v - n;
-  
-  
   ones = v % 10;
   v = v / 10;
   tens = v % 10;
@@ -179,13 +174,13 @@ void printNumber(float n) {
 void loop() {
   //  writeArduinoOn7Segment();
   char customKey = customKeypad.getKey();
-  
-  if (customKey){
+
+  if (customKey) {
     char inputCopy[2] = {customKey};
     int result = atoi(inputCopy);
     printNumber(result);
 
-    
+
     Serial.println(customKey);
   }
 
