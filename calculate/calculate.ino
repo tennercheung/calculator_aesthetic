@@ -38,7 +38,7 @@ float total;
 //char digit[7];
 
 /* operation */
-enum Operator{none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.'};
+enum Operator{none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
 enum Operator oper = none;
 
 /* boolean value if the value contains a decimal*/
@@ -100,19 +100,26 @@ void operKeySetter() {
   switch(key) {
     case add:
       oper = add;
-      setNumOne();
+      if(hasError) {
+        hasError = false;
+      }
       break;
     case subtract:
       oper = subtract;
-      setNumOne();
+      if(hasError) {
+        hasError = false;
+      }
       break;
     case multiply:
       oper = multiply;
-      setNumOne();
-      break;
+      if(hasError) {
+        hasError = false;
+      }
     case divide:
       oper = divide;
-      setNumOne();
+      if(hasError) {
+        hasError = false;
+      }
       break;
     case clr:
       reset();
@@ -123,6 +130,9 @@ void operKeySetter() {
     case dot:
       setDecimal();
       break;
+    case negative:
+       total *= -1;
+       break;
   }
 }
 
@@ -131,10 +141,22 @@ void operKeySetter() {
 
 // Adding the values inputed from the user 
 void numKeySetter(float i) {
-  // AHHHHHHH i can't explain this in words sooo yeahhhh.....
-  if(hasResult && oper == none) {
-    reset();
-  }
+   // AHHHHHHH i can't explain this in words sooo yeahhhh.....
+   if(hasResult && oper == none) {
+     reset();
+   }
+
+   // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
+   if(oper != none) {
+      numDigit = 0;
+      numOne = total;
+      total = 0;
+   }
+
+   // This conditions clears the error once a new input has been clicked
+   if(hasError) {
+     hasError = false;
+   }
   
   if ( numDigit <= 7) {
     if (total == 0) {
@@ -142,30 +164,12 @@ void numKeySetter(float i) {
     } else {
       total = (total * 10) + i;
     }
-    // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
-    if(oper != none) {
-      numDigit = 0;
-    }
-
-    // This conditions clears the error once a new input has been clicked
-    if(hasError) {
-      hasError = false;
-    }
     
 //    digit[numDigit] = i;
     numDigit++;
   }
 }
 
-// Called if an arithmetic operator has been clicked. Stores the pervious input and resets the total
-void setNumOne() {
-  // This conditions clears the error once a new input has been clicked
-  if(hasError) {
-      hasError = false;
-  }
-  numOne = total;
-  total = 0;
-}
 
 // Called if the CLEAR operator has been clicked
 void reset() {
@@ -237,7 +241,7 @@ void printNumber(float v) {
     return;
   if (v < 0) {
     negative = true;
-    v = v * -1;
+    v *= -1;
   }
 
 
