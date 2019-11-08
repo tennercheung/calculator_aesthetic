@@ -23,7 +23,7 @@ void setup() {
   */
   lc.shutdown(0, false);
   /* Set the brightness to a medium values */
-  lc.setIntensity(0, 4);
+  lc.setIntensity(0, 5);
   /* and clear the display */
   lc.clearDisplay(0);
 }
@@ -73,8 +73,30 @@ void setup() {
 //  delay(delaytime);
 //}
 
-void printNumber(int v) {
+int decimalToInt(float n) {
+  if( n < 0.000001) {
+    return n * 100000000;
+  } else if ( n < 0.000001) {
+    return n * 10000000;
+  } else if ( n < 0.00001) {
+    return n * 1000000;
+  } else if ( n < 0.0001) {
+    return n * 100000;
+  } else if ( n < 0.001) {
+    return n * 10000;
+  }  else if ( n < 0.01) {
+    return n * 1000;
+  } else if ( n < 0.01) {
+    return n * 1000;
+  } else if ( n < 0.1) {
+    return n * 100;
+  } else {
+    return n * 10;
+  }
+}
 
+void printNumber(float n) {
+  
   int ones;
   int tens;
   int hundreds;
@@ -84,14 +106,19 @@ void printNumber(int v) {
   int millions;
 
   boolean negative;
+  boolean hasDecimal;
 
-  if (v < -999999 || v > 999999) {
+  if (v < -9999 || v > 9999)
     return;
-  }
   if (v < 0) {
     negative = true;
     v = v * -1;
   }
+
+  int v = (int) n;
+  float temp = v - n;
+  
+  
   ones = v % 10;
   v = v / 10;
   tens = v % 10;
@@ -106,15 +133,13 @@ void printNumber(int v) {
   v = v / 10;
   millions = v;
 
-  if (negative == true) {
+  if (negative) {
     //print character '-' in the leftmost column
     lc.setChar(0, 7, '-', false);
   }
-  else if (negative == false) {
+  else {
     //print a blank in the sign column
-    //    lc.setChar(0, 7, ' ', false);
     lc.setChar(0, 7, ' ', false);
-
   }
   //Now print the number digit by digit
 
@@ -125,18 +150,15 @@ void printNumber(int v) {
   lc.setDigit(0, 2, (byte)hundreds, false);
   lc.setDigit(0, 1, (byte)tens, false);
   lc.setDigit(0, 0, (byte)ones, false);
-
 }
 
 
 void loop() {
   //  writeArduinoOn7Segment();
-
-
-  printNumber(12345);
-  //  delay(500);
-  //  /* and clear the display */
-  //  lc.clearDisplay(0);
-  //  delay(500);
+  printNumber(12);
+//  delay(500);
+//  /* and clear the display */
+//  lc.clearDisplay(0);
+//  delay(500);
   //  scrollDigits();
 }
