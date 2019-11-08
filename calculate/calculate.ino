@@ -9,6 +9,51 @@
   pin 10 is connected to LOAD
   We have only a single MAX72XX.
 */
+
+#include <Keypad.h>
+
+#include <stdio.h>
+
+#include <stdlib.h>
+
+// Globar Variables
+const byte ROWS = 4; 
+const byte COLS = 4; 
+
+char hexaKeys[ROWS][COLS] = {
+  {'1', '2', '3', '+'},
+  {'4', '5', '6', '-'},
+  {'7', '8', '9', '.'},
+  {'*', '0', '/', '='}
+};
+
+byte rowPins[ROWS] = {9, 8, 7, 6}; 
+byte colPins[COLS] = {5, 4, 3, 2}; 
+
+/* Char holder for the value*/
+char valueOne[8];
+char valueTwo[8];
+
+float total;
+
+/* operation */
+enum operation {+, -, *, /, =, CE} oper;
+
+/* boolean value if the value contains a decimal*/
+boolean hasDecimalOne = false;
+boolean hasDecimalTwo = false;
+
+/* number of digits for each value */
+int count1 = 0;
+int count2 = 0;
+
+/* if an operation has been entered */
+boolean hasOperator = false;
+
+/*///////////////////////////////////////////////////////////////////////////////*/
+
+Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS); 
+ 
 LedControl lc = LedControl(12, 11, 10, 1);
 
 /* we always wait a bit between updates of the display */
@@ -131,9 +176,17 @@ void printNumber(int v) {
 
 void loop() {
   //  writeArduinoOn7Segment();
+  char customKey = customKeypad.getKey();
+  
+  if (customKey){
+    char inputCopy[2] = {customKey};
+    int result = atoi(inputCopy);
+    printNumber(result);
 
+    
+    Serial.println(customKey);
+  }
 
-  printNumber(12345);
   //  delay(500);
   //  /* and clear the display */
   //  lc.clearDisplay(0);
