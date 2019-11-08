@@ -32,7 +32,7 @@ byte colPins[COLS] = {5, 4, 3, 2};
 
 /* Holds the value for User inputs*/
 float numOne;
-float total;
+float total = 0;
 
 // array for printing it with a for loop, stores each num input 
 //char digit[7];
@@ -61,7 +61,7 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 LedControl lc = LedControl(12, 11, 10, 1);
 
 /////////////////////////////////////////////////////////////////////////////////
-// Listens for key
+// Key Listener Functions
 void keyListener() {
   switch (key) {
     case '1':
@@ -126,11 +126,20 @@ void operKeySetter() {
       break;
     case equal:
       getEqual();
+      if(hasError) {
+        hasError = false;
+      }
       break;
     case dot:
+      if(hasError) {
+        hasError = false;
+      }
       setDecimal();
       break;
     case negative:
+       if(hasError) {
+        hasError = false;
+       }
        total *= -1;
        break;
   }
