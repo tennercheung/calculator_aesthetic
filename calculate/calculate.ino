@@ -73,28 +73,6 @@ void setup() {
 //  delay(delaytime);
 //}
 
-int decimalToInt(float n) {
-  if( n < 0.000001) {
-    return n * 100000000;
-  } else if ( n < 0.000001) {
-    return n * 10000000;
-  } else if ( n < 0.00001) {
-    return n * 1000000;
-  } else if ( n < 0.0001) {
-    return n * 100000;
-  } else if ( n < 0.001) {
-    return n * 10000;
-  }  else if ( n < 0.01) {
-    return n * 1000;
-  } else if ( n < 0.01) {
-    return n * 1000;
-  } else if ( n < 0.1) {
-    return n * 100;
-  } else {
-    return n * 10;
-  }
-}
-
 void printNumber(float n) {
   
   int ones;
