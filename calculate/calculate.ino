@@ -96,18 +96,6 @@ void keyListener() {
   }
 }
 
-void numKeySetter(float i) {
-  if ( numDigit <= 7) {
-    if (total == 0) {
-      total = i;
-    } else {
-      total = (total * 10) + i;
-    }
-    digit[numDigit] = i;
-    numDigit++;
-  }
-}
-
 void operKeySetter() {
   switch(key) {
     case add:
@@ -138,21 +126,57 @@ void operKeySetter() {
   }
 }
 
+/////////////////////////////////////////////////////////////////////////////////
+// ********** Helper Functions ************** //  
+
+// Adding the values inputed from the user 
+void numKeySetter(float i) {
+  if ( numDigit <= 7) {
+    if (total == 0) {
+      total = i;
+    } else {
+      total = (total * 10) + i;
+    }
+    // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
+    if(oper != none) {
+      numDigit = 0;
+    }
+
+    // This conditions clears the error once a new input has been clicked
+    if(hasError) {
+      hasError = false;
+    }
+    
+    digit[numDigit] = i;
+    numDigit++;
+  }
+}
+
+// Called if an arithmetic operator has been clicked. Stores the pervious input and resets the total
 void setNumOne() {
-  numOne += total;
+  // This conditions clears the error once a new input has been clicked
+  if(hasError) {
+      hasError = false;
+  }
+  numOne = total;
   total = 0;
 }
 
+// Called if the CLEAR operator has been clicked
 void reset() {
   numOne = 0;
   total = 0;
+  numDigit = 0;
+  digit[0] = 0; 
   oper = none;
 }
 
+// TODO: implement adding decimals
 void setDecimal(){
   
 };
 
+// Called if the EQUAL operator has been clicked. This evaluates the total and the number one value
 void getEqual() {
   if (oper != none) {
     switch(oper) {
@@ -168,17 +192,19 @@ void getEqual() {
       case divide:
         if(total != 0) {
           total = numOne / total;
-          break;
         } else {
           hasError = true;
-          break;
+          reset();
         }
+        break;
     }
-    numOne = total;
+    setNumOne();
     hasResult = true;
     oper = none;
    }
  }
+
+ /////////////////////////////////////////////////////////////////////////
 
   /* we always wait a bit between updates of the display */
 unsigned long delaytime = 100;
@@ -198,62 +224,9 @@ void setup() {
 }
 
 
-/*
-  This method will display the characters for the
-  word "Arduino" one after the other on digit 0.
-*/
-//void writeArduinoOn7Segment() {
-//  lc.setChar(0, 0, '-', false);
-//  delay(delaytime);
-//  lc.setRow(0, 0, 0x05);
-//  delay(delaytime);
-//  lc.setChar(0, 0, 'd', false);
-//  delay(delaytime);
-//  lc.setRow(0, 0, 0x1c);
-//  delay(delaytime);
-//  lc.setRow(0, 0, B00010000);
-//  delay(delaytime);
-//  lc.setRow(0, 0, 0x15);
-//  delay(delaytime);
-//  lc.setRow(0, 0, 0x1D);
-//  delay(delaytime);
-//  lc.clearDisplay(0);
-//  delay(delaytime);
-//}
-
-/*
-  This method will scroll all the hexa-decimal
-  numbers and letters on the display. You will need at least
-  four 7-Segment digits. otherwise it won't really look that good.
-*/
-//void scrollDigits() {
-//  for (int i = 0; i < 13; i++) {
-//    lc.setDigit(0, 7, i, false);
-//    lc.setDigit(0, 6, i + 1, false);
-//    lc.setDigit(0, 5, i + 2, false);
-//    lc.setDigit(0, 4, i + 3, false);
-//    lc.setDigit(0, 3, i + 4, false);
-//    lc.setDigit(0, 2, i + 5, false);
-//    lc.setDigit(0, 1, i + 6, false);
-//    lc.setDigit(0, 0, i + 7, false);
-//    delay(delaytime);
-//  }
-//  lc.clearDisplay(0);
-//  delay(delaytime);
-//}
-
 void printNumber(float v) {
 
-//  float ones;
-//  float tens;
-//  float hundreds;
-//  float thousands;
-//  float tenthousands;
-//  float hundthousands;
-//  float millions;
-
   boolean negative;
-
 
   if (v < -9999 || v > 9999)
     return;
@@ -284,9 +257,9 @@ void printNumber(float v) {
   }
 }
 
+// Prints error message
 void printError() {
-  reset();
-  hasError = false;
+
 }
 
 
