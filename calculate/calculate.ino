@@ -32,25 +32,26 @@ byte colPins[COLS] = {5, 4, 3, 2};
 
 /* Holds the value for User inputs*/
 float numOne;
-//float numTwo;
 float total;
 
+// array for printing it with a for loop, stores each num input 
+float digit[7];
+
 /* operation */
-enum operators {plus = '+', minus = '-', multiply = '*', divide = '/', clr = 'c', equal = '='};
-enum operators oper;
+enum Operator{none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.'};
+enum Operator oper = none;
 
 /* boolean value if the value contains a decimal*/
 boolean hasDecimal = false;
-//boolean hasDecimalTwo = false;
 
 /* number of digits for each value */
 int numDigit = 0;
 
 /* if an operation has been entered */
-boolean hasOperator = false;
-boolean result = false;
+boolean hasResult = false;
+boolean hasError = false;
 
-// key character from key pad 
+// key character from key pad
 char key;
 
 /*///////////////////////////////////////////////////////////////////////////////*/
@@ -59,10 +60,10 @@ Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS)
 
 LedControl lc = LedControl(12, 11, 10, 1);
 
-///////////////////////////////////////////////////////////////////////////////// 
+/////////////////////////////////////////////////////////////////////////////////
 // Listens for key
 void keyListener() {
-  switch(key) {
+  switch (key) {
     case '1':
       numKeySetter(1);
       break;
@@ -96,24 +97,90 @@ void keyListener() {
 }
 
 void numKeySetter(float i) {
-  if( numDigit <= 7) {
-    if(total == 0) {
+  if ( numDigit <= 7) {
+    if (total == 0) {
       total = i;
     } else {
-      total = (total*10) + i;
+      total = (total * 10) + i;
     }
+    digit[numDigit] = i;
     numDigit++;
   }
 }
 
 void operKeySetter() {
-  swtich(key):
-    case plus:
-          
-      
+  switch(key) {
+    case add:
+      oper = add;
+      setNumOne();
+      break;
+    case subtract:
+      oper = subtract;
+      setNumOne();
+      break;
+    case multiply:
+      oper = multiply;
+      setNumOne();
+      break;
+    case divide:
+      oper = divide;
+      setNumOne();
+      break;
+    case clr:
+      reset();
+      break;
+    case equal:
+      getEqual();
+      break;
+    case dot:
+      setDecimal();
+      break;
+  }
 }
 
-/* we always wait a bit between updates of the display */
+void setNumOne() {
+  numOne += total;
+  total = 0;
+}
+
+void reset() {
+  numOne = 0;
+  total = 0;
+  oper = none;
+}
+
+void setDecimal(){
+  
+};
+
+void getEqual() {
+  if (oper != none) {
+    switch(oper) {
+      case add:
+        total = numOne + total;
+        break;
+      case subtract:
+        total = numOne - total;
+        break;
+      case multiply:
+        total = numOne * total;
+        break;
+      case divide:
+        if(total != 0) {
+          total = numOne / total;
+          break;
+        } else {
+          hasError = true;
+          break;
+        }
+    }
+    numOne = total;
+    hasResult = true;
+    oper = none;
+   }
+ }
+
+  /* we always wait a bit between updates of the display */
 unsigned long delaytime = 100;
 
 void setup() {
@@ -175,18 +242,18 @@ void setup() {
 //  delay(delaytime);
 //}
 
-void printNumber(int v) {
+void printNumber(float v) {
 
-  int ones;
-  int tens;
-  int hundreds;
-  int thousands;
-  int tenthousands;
-  int hundthousands;
-  int millions;
+//  float ones;
+//  float tens;
+//  float hundreds;
+//  float thousands;
+//  float tenthousands;
+//  float hundthousands;
+//  float millions;
 
   boolean negative;
-  boolean hasDecimal;
+
 
   if (v < -9999 || v > 9999)
     return;
@@ -195,37 +262,31 @@ void printNumber(int v) {
     v = v * -1;
   }
 
-  ones = v % 10;
-  v = v / 10;
-  tens = v % 10;
-  v = v / 10;
-  hundreds = v % 10;
-  v = v / 10;
-  thousands = v % 10;
-  v = v / 10;
-  tenthousands = v % 10;
-  v = v / 10;
-  hundthousands = v % 10;
-  v = v / 10;
-  millions = v;
 
   if (negative) {
     //print character '-' in the leftmost column
-    lc.setChar(0, 7, '-', false);
+    lc.setChar(0, numDigit - 1, '-', false);
   }
   else {
     //print a blank in the sign column
-    lc.setChar(0, 7, ' ', false);
+    lc.setChar(0, numDigit - 1, ' ', false);
   }
+  
   //Now print the number digit by digit
+  int iterator = numDigit;
+  for(int i = 0; i <= 7; i++) {
+    if( i <= numDigit) {
+      lc.setDigit(0, i, (byte) digit[iterator], false);
+      iterator --;
+    } else {
+      lc.setDigit(0, i, ' ', false);
+    }
+  }
+}
 
-  lc.setDigit(0, 6, (byte)millions, false);
-  lc.setDigit(0, 5, (byte)hundthousands, false);
-  lc.setDigit(0, 4, (byte)tenthousands, false);
-  lc.setDigit(0, 3, (byte)thousands, false);
-  lc.setDigit(0, 2, (byte)hundreds, false);
-  lc.setDigit(0, 1, (byte)tens, false);
-  lc.setDigit(0, 0, (byte)ones, false);
+void printError() {
+  reset();
+  hasError = false;
 }
 
 
@@ -233,18 +294,15 @@ void loop() {
   //  writeArduinoOn7Segment();
   key = customKeypad.getKey();
 
-  if (customKey) {
-    char inputCopy[2] = {customKey};
-    int result = atoi(inputCopy);
-    printNumber(result);
-
-
-    Serial.println(customKey);
+  if (key) {
+    keyListener();
+    Serial.println(key);
   }
 
-  //  delay(500);
-  //  /* and clear the display */
-  //  lc.clearDisplay(0);
-  //  delay(500);
-  //  scrollDigits();
+  if(!hasError) {
+    printNumber(total);
+  } else {
+    printError();
+  }
+
 }
