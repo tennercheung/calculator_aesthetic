@@ -22,7 +22,7 @@ const byte COLS = 4;
 
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3', '+'},
-  {'4', '5', '6', '-'},
+  {'4', 'c', '6', '-'},
   {'7', '8', '9', '.'},
   {'*', '0', '/', '='}
 };
@@ -36,24 +36,82 @@ float numOne;
 float total;
 
 /* operation */
-//enum operation {+, -, *, /, =, CE} oper;
+enum operators {plus = '+', minus = '-', multiply = '*', divide = '/', clr = 'c', equal = '='};
+enum operators oper;
 
 /* boolean value if the value contains a decimal*/
-boolean hasDecimalOne = false;
+boolean hasDecimal = false;
 //boolean hasDecimalTwo = false;
 
 /* number of digits for each value */
-int count1 = 0;
-int count2 = 0;
+int numDigit = 0;
 
 /* if an operation has been entered */
 boolean hasOperator = false;
+boolean result = false;
+
+// key character from key pad 
+char key;
 
 /*///////////////////////////////////////////////////////////////////////////////*/
 
 Keypad customKeypad = Keypad(makeKeymap(hexaKeys), rowPins, colPins, ROWS, COLS);
 
 LedControl lc = LedControl(12, 11, 10, 1);
+
+///////////////////////////////////////////////////////////////////////////////// 
+// Listens for key
+void keyListener() {
+  switch(key) {
+    case '1':
+      numKeySetter(1);
+      break;
+    case '2':
+      numKeySetter(2);
+      break;
+    case '3':
+      numKeySetter(3);
+      break;
+    case '4':
+      numKeySetter(4);
+      break;
+    case '5':
+      numKeySetter(5);
+      break;
+    case '6':
+      numKeySetter(6);
+      break;
+    case '7':
+      numKeySetter(7);
+      break;
+    case '8':
+      numKeySetter(8);
+      break;
+    case '9':
+      numKeySetter(9);
+      break;
+    default:
+      operKeySetter();
+  }
+}
+
+void numKeySetter(float i) {
+  if( numDigit <= 7) {
+    if(total == 0) {
+      total = i;
+    } else {
+      total = (total*10) + i;
+    }
+    numDigit++;
+  }
+}
+
+void operKeySetter() {
+  swtich(key):
+    case plus:
+          
+      
+}
 
 /* we always wait a bit between updates of the display */
 unsigned long delaytime = 100;
@@ -173,7 +231,7 @@ void printNumber(int v) {
 
 void loop() {
   //  writeArduinoOn7Segment();
-  char customKey = customKeypad.getKey();
+  key = customKeypad.getKey();
 
   if (customKey) {
     char inputCopy[2] = {customKey};
