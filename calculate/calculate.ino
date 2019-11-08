@@ -131,6 +131,11 @@ void operKeySetter() {
 
 // Adding the values inputed from the user 
 void numKeySetter(float i) {
+  // AHHHHHHH i can't explain this in words sooo yeahhhh.....
+  if(hasResult && oper == none) {
+    reset();
+  }
+  
   if ( numDigit <= 7) {
     if (total == 0) {
       total = i;
@@ -169,6 +174,7 @@ void reset() {
   numDigit = 0;
   digit[0] = 0; 
   oper = none;
+  hasResult = false;
 }
 
 // TODO: implement adding decimals
@@ -257,7 +263,7 @@ void printNumber(float v) {
   }
 }
 
-// Prints error message
+// TODO: print an error message when an arithmetic error appears 
 void printError() {
 
 }
