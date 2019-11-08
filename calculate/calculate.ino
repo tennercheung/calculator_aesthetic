@@ -35,7 +35,7 @@ float numOne;
 float total;
 
 // array for printing it with a for loop, stores each num input 
-float digit[7];
+//char digit[7];
 
 /* operation */
 enum Operator{none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.'};
@@ -152,7 +152,7 @@ void numKeySetter(float i) {
       hasError = false;
     }
     
-    digit[numDigit] = i;
+//    digit[numDigit] = i;
     numDigit++;
   }
 }
@@ -171,8 +171,7 @@ void setNumOne() {
 void reset() {
   numOne = 0;
   total = 0;
-  numDigit = 0;
-  digit[0] = 0; 
+  numDigit = 0; 
   oper = none;
   hasResult = false;
 }
@@ -250,6 +249,9 @@ void printNumber(float v) {
     //print a blank in the sign column
     lc.setChar(0, numDigit - 1, ' ', false);
   }
+
+  char digit[7];
+  sprintf(digit, "%g", v);
   
   //Now print the number digit by digit
   int iterator = numDigit;
