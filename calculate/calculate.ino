@@ -34,11 +34,11 @@ byte colPins[COLS] = {5, 4, 3, 2};
 float numOne;
 float total = 0;
 
-// array for printing it with a for loop, stores each num input 
+// array for printing it with a for loop, stores each num input
 //char digit[7];
 
 /* operation */
-enum Operator{none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
+enum Operator {none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
 enum Operator oper = none;
 
 /* boolean value if the value contains a decimal*/
@@ -97,84 +97,57 @@ void keyListener() {
 }
 
 void operKeySetter() {
-  switch(key) {
+  switch (key) {
     case add:
       oper = add;
-      if(hasError) {
-        hasError = false;
-      }
       break;
     case subtract:
       oper = subtract;
-      if(hasError) {
-        hasError = false;
-      }
       break;
     case multiply:
       oper = multiply;
-      if(hasError) {
-        hasError = false;
-      }
     case divide:
       oper = divide;
-      if(hasError) {
-        hasError = false;
-      }
       break;
     case clr:
       reset();
       break;
     case equal:
       getEqual();
-      if(hasError) {
-        hasError = false;
-      }
       break;
     case dot:
-      if(hasError) {
-        hasError = false;
-      }
       setDecimal();
       break;
     case negative:
-       if(hasError) {
-        hasError = false;
-       }
-       total *= -1;
-       break;
+      total *= -1;
+      break;
   }
 }
 
 /////////////////////////////////////////////////////////////////////////////////
-// ********** Helper Functions ************** //  
+// ********** Helper Functions ************** //
 
-// Adding the values inputed from the user 
+// Adding the values inputed from the user
 void numKeySetter(float i) {
-   // AHHHHHHH i can't explain this in words sooo yeahhhh.....
-   if(hasResult && oper == none) {
-     reset();
-   }
+  // AHHHHHHH i can't explain this in words sooo yeahhhh.....
+  if (hasResult && oper == none) {
+    reset();
+  }
 
-   // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
-   if(oper != none) {
-      numDigit = 0;
-      numOne = total;
-      total = 0;
-   }
+  // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
+  if (oper != none) {
+    numOne = total;
+    total = 0;
+  }
 
-   // This conditions clears the error once a new input has been clicked
-   if(hasError) {
-     hasError = false;
-   }
-  
   if ( numDigit <= 7) {
     if (total == 0) {
       total = i;
     } else {
       total = (total * 10) + i;
     }
-    
-//    digit[numDigit] = i;
+
+    //    digit[numDigit] = i;
     numDigit++;
   }
 }
@@ -184,20 +157,20 @@ void numKeySetter(float i) {
 void reset() {
   numOne = 0;
   total = 0;
-  numDigit = 0; 
+  numDigit = 0;
   oper = none;
   hasResult = false;
 }
 
 // TODO: implement adding decimals
-void setDecimal(){
-  
+void setDecimal() {
+
 };
 
 // Called if the EQUAL operator has been clicked. This evaluates the total and the number one value
 void getEqual() {
   if (oper != none) {
-    switch(oper) {
+    switch (oper) {
       case add:
         total = numOne + total;
         break;
@@ -208,7 +181,7 @@ void getEqual() {
         total = numOne * total;
         break;
       case divide:
-        if(total != 0) {
+        if (total != 0) {
           total = numOne / total;
         } else {
           hasError = true;
@@ -216,15 +189,14 @@ void getEqual() {
         }
         break;
     }
-    setNumOne();
     hasResult = true;
     oper = none;
-   }
- }
+  }
+}
 
- /////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////
 
-  /* we always wait a bit between updates of the display */
+/* we always wait a bit between updates of the display */
 unsigned long delaytime = 100;
 
 void setup() {
@@ -265,11 +237,11 @@ void printNumber(float v) {
 
   char digit[7];
   sprintf(digit, "%g", v);
-  
+
   //Now print the number digit by digit
   int iterator = numDigit;
-  for(int i = 0; i <= 7; i++) {
-    if( i <= numDigit) {
+  for (int i = 0; i <= 7; i++) {
+    if ( i <= numDigit) {
       lc.setDigit(0, i, (byte) digit[iterator], false);
       iterator --;
     } else {
@@ -278,7 +250,7 @@ void printNumber(float v) {
   }
 }
 
-// TODO: print an error message when an arithmetic error appears 
+// TODO: print an error message when an arithmetic error appears
 void printError() {
 
 }
@@ -293,10 +265,11 @@ void loop() {
     Serial.println(key);
   }
 
-  if(!hasError) {
+  if (!hasError) {
     printNumber(total);
   } else {
     printError();
   }
+
 
 }
