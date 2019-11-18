@@ -23,7 +23,7 @@ const byte COLS = 4;
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3', '+'},
   {'4', 'c', '6', '-'},
-  {'7', '8', '9', '.'},
+  {'7', '8', '9', 'c'},
   {'*', '0', '/', '='}
 };
 
@@ -35,7 +35,7 @@ float numOne;
 float total = 0;
 
 // array for printing it with a for loop, stores each num input
-//char digit[7];
+char digit[7];
 
 /* operation */
 enum Operator {none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
@@ -147,7 +147,7 @@ void numKeySetter(float i) {
       total = (total * 10) + i;
     }
 
-    //    digit[numDigit] = i;
+    digit[numDigit] = i;
     numDigit++;
   }
 }
@@ -234,9 +234,6 @@ void printNumber(float v) {
     //print a blank in the sign column
     lc.setChar(0, numDigit - 1, ' ', false);
   }
-
-  char digit[7];
-  sprintf(digit, "%g", v);
 
   //Now print the number digit by digit
   int iterator = numDigit;
