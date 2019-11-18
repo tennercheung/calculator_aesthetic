@@ -142,7 +142,7 @@ void numKeySetter(float i) {
     total = 0;
   }
 
-  if ( numDigit <= 7) {
+  if ( numDigit < 7) {
     if (total == 0) {
       total = i;
     } else {
@@ -188,6 +188,11 @@ void getEqual() {
 
 
 //// Printing Helper
+float remainder (float val) {
+
+  return (fmod(val, 10));
+}
+
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -213,33 +218,87 @@ void printNumber(float v) {
 
   boolean negative;
 
-  if (v < -9999 || v > 9999)
+  if (v < -9999999 || v > 9999999)
     return;
   if (v < 0) {
     negative = true;
     v *= -1;
   }
 
-
-  if (negative) {
+  if (!negative) {
     //print character '-' in the leftmost column
-    lc.setChar(0, numDigit - 1, '-', false);
+    lc.setChar(0, numDigit, '-', false);
+  }
+//  else {
+//    //print a blank in the sign column
+//    lc.setChar(0, numDigit, ' ', false);
+//  }
+
+  float ones;
+  float tens;
+  float hundreds;
+  float thousands;
+  float tenthousands;
+  float hundthousands;
+  float millions;
+
+  ones = remainder(v); v = v / 10;
+  tens = remainder(v); v = v / 10;
+  hundreds = remainder(v); v = v / 10;
+  thousands = remainder(v); v = v / 10;
+  tenthousands = remainder(v); v = v / 10;
+  hundthousands = remainder(v); v = v / 10;
+  millions = v;
+
+  /* prints the number digit by digit */
+  if (numDigit == 6) {
+    lc.setDigit(0, 6, (byte)millions, false);
+  } else {
+    lc.setDigit(0, 6, ' ', false);
+  }
+  if (numDigit >= 5) {
+    lc.setDigit(0, 5, (byte)hundthousands, false);
   }
   else {
-    //print a blank in the sign column
-    lc.setChar(0, numDigit - 1, ' ', false);
+    lc.setDigit(0, 5, ' ', false);
   }
+  if (numDigit >= 4) {
+    lc.setDigit(0, 4, (byte)tenthousands, false);
+  }
+  else {
+    lc.setDigit(0, 4, ' ', false);
+  }
+  if (numDigit >= 3) {
+    lc.setDigit(0, 3, (byte)thousands, false);
+  }
+  else {
+    lc.setDigit(0, 3, ' ', false);
+  }
+  if (numDigit >= 2) {
+    lc.setDigit(0, 2, (byte)hundreds, false);
+  }
+  else {
+    lc.setDigit(0, 2, ' ', false);
+  }
+  if (numDigit >= 1) {
+    lc.setDigit(0, 1, (byte)tens, false);
+  }
+  else {
+    lc.setDigit(0, 1, ' ', false);
+  }
+
+  lc.setDigit(0, 0, (byte)ones, false);
 
   //Now print the number digit by digit
 //  char digit[7];
-  int iterator = numDigit - 1;
-  for (int i = 0; i < 7; i++) {
-    if (i > 0 && i <= numDigit) {
-      lc.setDigit(0, i, (byte) digit[iterator--], false);
-     } else {
-      lc.setDigit(0, i, ' ', false);
-    }
-  }
+//  int iterator = numDigit - 1;
+//  for (int i = 0; i < 7; i++) {
+//    if (i > 0 && i <= numDigit) {
+//      lc.setDigit(0, i, (byte) digit[iterator--], false);
+//     } else {
+//      lc.setDigit(0, i, ' ', false);
+//    }
+//  }
 }
 
 // TODO: print an error message when an arithmetic error appears
@@ -257,12 +316,11 @@ void loop() {
     Serial.println(key);
     Serial.println(total);
     Serial.println(numDigit);
-  }
-
-  if (!hasError) {
+    if (!hasError) {
     printNumber(total);
   } else {
     printError();
+  }
   }
 
 
