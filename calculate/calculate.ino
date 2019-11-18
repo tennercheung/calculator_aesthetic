@@ -35,7 +35,7 @@ float numOne;
 float total = 0;
 
 // array for printing it with a for loop, stores each num input
-char digit[7];
+//char digit[7];
 
 /* operation */
 enum Operator {none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
@@ -147,7 +147,7 @@ void numKeySetter(float i) {
       total = (total * 10) + i;
     }
 
-    digit[numDigit] = i;
+//    digit[numDigit] = i;
     numDigit++;
   }
 }
@@ -194,6 +194,63 @@ void getEqual() {
   }
 }
 
+
+//// Printing Helper
+void reverse(char* str, int len) 
+{ 
+    int i = 0, j = len - 1, temp; 
+    while (i < j) { 
+        temp = str[i]; 
+        str[i] = str[j]; 
+        str[j] = temp; 
+        i++; 
+        j--; 
+    } 
+} 
+  
+int intToStr(int x, char str[], int d) 
+{ 
+    int i = 0; 
+    while (x) { 
+        str[i++] = (x % 10) + '0'; 
+        x = x / 10; 
+    } 
+  
+    // If number of digits required is more, then 
+    // add 0s at the beginning 
+    while (i < d) 
+        str[i++] = '0'; 
+  
+    reverse(str, i); 
+    str[i] = '\0'; 
+    return i; 
+} 
+  
+// Converts a floating-point/double number to a string. 
+void ftoa(float n, char* res, int afterpoint) 
+{ 
+    // Extract integer part 
+    int ipart = (int)n; 
+  
+    // Extract floating part 
+    float fpart = n - (float)ipart; 
+  
+    // convert integer part to string 
+    int i = intToStr(ipart, res, 0); 
+  
+    // check for display option after point 
+    if (afterpoint != 0) { 
+        res[i] = '.'; // add dot 
+  
+        // Get the value of fraction part upto given no. 
+        // of points after dot. The third parameter  
+        // is needed to handle cases like 233.007 
+        fpart = fpart * pow(10, afterpoint); 
+  
+        intToStr((int)fpart, res + i + 1, afterpoint); 
+    } 
+} 
+
 /////////////////////////////////////////////////////////////////////////
 
 /* we always wait a bit between updates of the display */
@@ -236,11 +293,13 @@ void printNumber(float v) {
   }
 
   //Now print the number digit by digit
+  char digit[7];
   int iterator = numDigit;
-  for (int i = 0; i <= 7; i++) {
+  ftoa(total, digit, 4);
+  for (int i = 0; i < 7; i++) {
     if ( i <= numDigit) {
       lc.setDigit(0, i, (byte) digit[iterator], false);
-      iterator --;
+      iterator--;
     } else {
       lc.setDigit(0, i, ' ', false);
     }
