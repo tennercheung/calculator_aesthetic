@@ -32,7 +32,7 @@ byte colPins[COLS] = {5, 4, 3, 2};
 
 /* Holds the value for User inputs*/
 float numOne;
-float total = 0;
+char buff[9] = { ' ', ' ', ' ', ' ', ' ', ' ', ' ', '\0'};
 
 /* operation */
 enum Operator {none, add = '+', subtract = '-', multiply = '*', divide = '/', clr = 'c', equal = '=', dot = '.', negative = '_'};
@@ -43,11 +43,13 @@ boolean hasDecimal = false;
 
 /* number of digits for each value */
 int numDigit = 0;
+int availableDigit = 7;
 
 /* if an operation has been entered */
 boolean hasResult = false;
 boolean hasError = false;
 boolean keepNum = false;
+boolean isNegative = false;
 
 // key character from key pad
 char key;
@@ -63,36 +65,6 @@ LedControl lc = LedControl(12, 11, 10, 1);
 // Key Listener Functions
 void keyListener() {
   switch (key) {
-    case '0':
-      numKeySetter(0);
-      break;
-    case '1':
-      numKeySetter(1);
-      break;
-    case '2':
-      numKeySetter(2);
-      break;
-    case '3':
-      numKeySetter(3);
-      break;
-    case '4':
-      numKeySetter(4);
-      break;
-    case '5':
-      numKeySetter(5);
-      break;
-    case '6':
-      numKeySetter(6);
-      break;
-    case '7':
-      numKeySetter(7);
-      break;
-    case '8':
-      numKeySetter(8);
-      break;
-    case '9':
-      numKeySetter(9);
-      break;
     case add:
       oper = add;
       keepNum = true;
@@ -115,12 +87,11 @@ void keyListener() {
     case equal:
       getEqual();
       break;
-    case dot:
-      hasDecimal = true;
-      break;
     case negative:
-      total *= -1;
+      isNegative = true;
       break;
+    default:
+      numKeySetter(key);
   }
 }
 
@@ -128,10 +99,10 @@ void keyListener() {
 // ********** Helper Functions ************** //
 
 // Adding the values inputed from the user
-void numKeySetter(float i) {
-  if (i == 0 && total == 0) {
-    return;
-  }
+void numKeySetter(char i) {
+  //  if (i == '0' && buff == '0) {
+  //    return;
+  //  }
   // AHHHHHHH i can't explain this in words sooo yeahhhh.....
   if (hasResult && oper == none) {
     reset();
@@ -139,135 +110,113 @@ void numKeySetter(float i) {
 
   // This condition makes sure that the print doesn't get cleared until a new number input has been clicked.
   if (keepNum && oper != none) {
-    numOne = total;
-    total = 0;
-    numDigit = 0;
-    hasDecimal = false;
-    lc.clearDisplay(0);
-  }
+    numOne = strtod(buff, NULL);
 
-  if ( numDigit < 7) {
-    if (hasDecimal) {
-      setDecimal(i);
-    } else if (total == 0) {
-      total = i;
-    } else {
-      total = (total * 10) + i;
+    if (isNegative) {
+      numOne *= -1;
     }
 
-    numDigit++;
+    for (int i = 0; i < 9; i++) {
+      buff[i] = ' ';
+    }
+    numDigit = 0;
+    availableDigit = 7;
+    hasDecimal = false;
+    lc.clearDisplay(0);
+    Serial.println(numOne);
   }
 
+  if ( numDigit < availableDigit) {
+    if ( i == dot) {
+      if (!hasDecimal) {
+        hasDecimal = true;
+        availableDigit = 8;
+      } else {
+        return;
+      }
+    }
+    buff[numDigit] = i;
+    numDigit++;
+  } 
+  
   keepNum = false;
 }
 
-// Called if the EQUAL operator has been clicked. This evaluates the total and the number one value
+// Called if the EQUAL operator has been clicked. This evaluates the buff and the number one value
 void getEqual() {
+  float numTwo = strtod(buff, NULL);
+  float result;
   if (oper != none) {
     switch (oper) {
       case add:
-        total = numOne + total;
+        result = numOne + numTwo;
         break;
       case subtract:
-        total = numOne - total;
+        result = numOne - numTwo;
         break;
       case multiply:
-        total = numOne * total;
+        result = numOne * numTwo;
         break;
       case divide:
-        if (total != 0) {
-          total = numOne / total;
+        if (numTwo != 0) {
+          result = numOne / numTwo;
         } else {
           hasError = true;
           return;
         }
         break;
     }
+    Serial.println(numTwo);
+    Serial.println(result);
+
+    if (result < 0) {
+      isNegative = true;
+    }
+    hasDecimal = false;
+    dtostrf(result, 1, 4, buff);
+    digitCounter();
+    Serial.println(numDigit);
     hasResult = true;
     oper = none;
-    //TODO: make is so this also calculates the decimal place 
-    numDigit = lenHelper(total);
   }
 }
 
 // Called if the CLEAR operator has been clicked
 void reset() {
+  for (int i = 0; i < 9; i++) {
+    buff[i] = ' ';
+  }
   numOne = 0;
-  total = 0;
   numDigit = 0;
+  availableDigit = 7;
   oper = none;
   hasResult = false;
+  hasDecimal = false;
   hasError = false;
   hasDecimal = false;
   lc.clearDisplay(0);
   lc.setDigit(0, 0, 0, false);
 }
 
-//Finding the length of digit
-int lenHelper(float x) {
-  if (x < 0) {
-    x *= -1;
+void digitCounter() {
+  int acc = 0;
+
+  // Counts from the end of array and stops either at the first encounter 
+  //of a decimal place or the at the encounter of the decimal point
+  for (int i = 8; i > 0; i--) {
+    if (buff[i] == dot) {
+        break;
+      } 
+      
+    if (buff[i] > '0' && buff[i] <= '9') {
+        acc--;
+        hasDecimal = true;
+        break;
+    }
+    acc++;
   }
-//  if (x <= 0) return 0;
-//  if (x >= 1000000000) return 10;
-//  if (x >= 100000000)  return 9;
-//  if (x >= 10000000)   return 8;
-//  if (x >= 1000000)    return 7;
-//  if (x >= 100000)     return 6;
-//  if (x >= 10000)      return 5;
-//  if (x >= 1000)       return 4;
-//  if (x >= 100)        return 3;
-//  if (x >= 10)         return 2;
-//  return 1;
-  return log10(x) + 1;
+  numDigit = 8 - acc;
 }
-
-// TODO: implement adding decimals
-// TODO: deal with this scenario : user inputs 0s as decimals 
-void setDecimal(float i) {
-  // Extract decimal from total
-  int intpart = (int) total;
-  float decimal = total - intpart;
-  int len = lenHelper(decimalToFloat(decimal));
-  
-  //Exponential function
-  if (len == 0) {
-    i /= 10;
-  } else if (len == 1) {
-    i /= 100;
-  } else if (len == 2) {
-    i /= 1000;
-  } else if (len == 3) {
-    i /= 10000;
-  } else if (len <= 4) {
-    i /= 100000;
-  }  else if (len <= 5) {
-    i /= 1000000;
-  } else if (len <= 6) {
-    i /= 10000000;
-  }
-  //  Serial.println(i);
-  total += i;
-};
-
-float decimalToFloat(float dec) {
-  float temp = dec;
-  while(abs(temp) <= 0.1) {
-    dec *= 10;
-    Serial.println(dec);
-    temp *=10;
-    temp -= (int)temp;
-  }
-  return dec;
-}
-
-
-
-//// Printing Helper
-float remainder (float val) {
-  return (fmod(val, 10));
-}
-
 
 /////////////////////////////////////////////////////////////////////////
 
@@ -291,57 +240,35 @@ void setup() {
 }
 
 
-void printNumber(float v) {
-
-  boolean negative = false;
-
+void printNumber() {
   if (numDigit == 0) {
     lc.setDigit(0, 0, 0, false);
     return;
   }
 
-  if (v < -9999999 || v > 9999999) {
-    return;
-  }
-
-  if (v < 0) {
-    negative = true;
-    v *= -1;
-  }
-
-  if (negative) {
+  if (isNegative) {
     //print character '-' in the leftmost column
     lc.setChar(0, numDigit, '-', false);
   }
 
   lc.clearDisplay(0);
-  float temp = v;
-  //This extracts the decimal when it loops 
-  boolean extractDecimal = true;
-  int numberOfDecimal;
+  int temp = numDigit - 1;
 
-  
-  //Now print the number digit by digit
   for (int i = 0; i < numDigit; i++) {
-    temp = remainder(v);
-    v = v / 10;
-    if(i < numDigit - 1) {
-      lc.setDigit(0, i, (byte)temp, false);
-//      if(extractDecimal && hasDecimal) {
-//         int intpart = (int) total;
-//         float decimal = total - intpart;
-//         v = decimal;
-//         extractDecimal = false;
-//      }
+    if (hasDecimal && buff[temp] == dot) {
+      temp--;
+      lc.setChar(0, i, buff[temp], true);
     } else {
-      lc.setDigit(0, i, (byte)temp, hasDecimal);
+      lc.setChar(0, i, buff[temp], false);
     }
+    temp--;
   }
+  Serial.println(buff);
+
 }
 
 void printError() {
   lc.clearDisplay(0);
-  //REEEEEEEEEEEEEEEEEEE PICKLE RICK 
   lc.setChar(0, 7, 'E', false);
   lc.setChar(0, 6, 'E', false);
   lc.setChar(0, 5, 'E', false);
@@ -359,13 +286,10 @@ void loop() {
   if (key) {
     keyListener();
     Serial.println(key);
-    Serial.println(total);
     if (!hasError) {
-      printNumber(total);
+      printNumber();
     } else {
       printError();
     }
   }
-
-
 }
