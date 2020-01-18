@@ -44,6 +44,8 @@ boolean hasDecimal = false;
 /* number of digits for each value */
 int numDigit = 0;
 int availableDigit = 7;
+int decNumOne;
+int decAcc;
 
 /* if an operation has been entered */
 boolean hasResult = false;
@@ -121,12 +123,18 @@ void numKeySetter(char i) {
     }
     numDigit = 0;
     availableDigit = 7;
+    decNumOne = decAcc;
+    decAcc = 0;
     hasDecimal = false;
     lc.clearDisplay(0);
     Serial.println(numOne);
   }
 
   if ( numDigit < availableDigit) {
+    if(hasDecimal) {
+      decAcc++;
+    }
+    
     if ( i == dot) {
       if (!hasDecimal) {
         hasDecimal = true;
@@ -144,9 +152,21 @@ void numKeySetter(char i) {
 
 // Called if the EQUAL operator has been clicked. This evaluates the buff and the number one value
 void getEqual() {
-  float numTwo = strtod(buff, NULL);
-  float result;
   if (oper != none) {
+    float numTwo = strtod(buff, NULL);
+    float result;
+    
+    if(oper == multiply) {
+      decNumOne = decNumOne + decAcc;
+    } else if ( oper == divide) {
+      decNumOne = 6;
+    } else if (decNumOne < decAcc) {
+      decNumOne = decAcc;
+    }
+
+    Serial.println("Decimal Precision");
+    Serial.println(decNumOne);
+    
     switch (oper) {
       case add:
         result = numOne + numTwo;
@@ -172,8 +192,9 @@ void getEqual() {
     if (result < 0) {
       isNegative = true;
     }
+    decAcc = 0;
     hasDecimal = false;
-    dtostrf(result, 1, 4, buff);
+    dtostrf(result, 1, decNumOne, buff);
     digitCounter();
     Serial.println(numDigit);
     hasResult = true;
@@ -188,6 +209,8 @@ void reset() {
   }
   numOne = 0;
   numDigit = 0;
+  decNumOne = 0;
+  decAcc = 0;
   availableDigit = 7;
   oper = none;
   hasResult = false;
@@ -269,14 +292,17 @@ void printNumber() {
 
 void printError() {
   lc.clearDisplay(0);
-  lc.setChar(0, 7, 'E', false);
-  lc.setChar(0, 6, 'E', false);
-  lc.setChar(0, 5, 'E', false);
+
   lc.setChar(0, 4, 'E', false);
-  lc.setChar(0, 3, 'E', false);
-  lc.setChar(0, 2, 'E', false);
-  lc.setChar(0, 1, 'E', false);
-  lc.setChar(0, 0, 'E', false);
+//  delay(100);
+  lc.setChar(0, 3, 'r', false);
+//  delay(100);
+  lc.setChar(0, 2, 'r', false);
+//  delay(100);
+  lc.setChar(0, 1, '0', false);
+//  delay(100);
+  lc.setChar(0, 0, 'r', false);
+//  delay(100);
 }
 
 
