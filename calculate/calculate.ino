@@ -22,7 +22,7 @@ const byte COLS = 4;
 
 char hexaKeys[ROWS][COLS] = {
   {'1', '2', '3', '+'},
-  {'4', '5', '6', '/'},
+  {'4', '5', '6', '-'},
   {'7', '8', '9', 'c'},
   {'*', '0', '.', '='}
 };
@@ -131,10 +131,10 @@ void numKeySetter(char i) {
   }
 
   if ( numDigit < availableDigit) {
-    if(hasDecimal) {
+    if (hasDecimal) {
       decAcc++;
     }
-    
+
     if ( i == dot) {
       if (!hasDecimal) {
         hasDecimal = true;
@@ -145,8 +145,8 @@ void numKeySetter(char i) {
     }
     buff[numDigit] = i;
     numDigit++;
-  } 
-  
+  }
+
   keepNum = false;
 }
 
@@ -155,8 +155,8 @@ void getEqual() {
   if (oper != none) {
     float numTwo = strtod(buff, NULL);
     float result;
-    
-    if(oper == multiply) {
+
+    if (oper == multiply) {
       decNumOne = decNumOne + decAcc;
     } else if ( oper == divide) {
       decNumOne = 6;
@@ -166,7 +166,7 @@ void getEqual() {
 
     Serial.println("Decimal Precision");
     Serial.println(decNumOne);
-    
+
     switch (oper) {
       case add:
         result = numOne + numTwo;
@@ -224,21 +224,27 @@ void reset() {
 void digitCounter() {
   int acc = 0;
 
-  // Counts from the end of array and stops either at the first encounter 
+  // Counts from the end of array and stops either at the first encounter
   //of a decimal place or the at the encounter of the decimal point
   for (int i = 8; i > 0; i--) {
     if (buff[i] == dot) {
-        break;
-      } 
-      
+      break;
+    }
+
     if (buff[i] > '0' && buff[i] <= '9') {
-        acc--;
-        hasDecimal = true;
-        break;
+      acc--;
+      hasDecimal = true;
+      break;
     }
     acc++;
   }
-  numDigit = 8 - acc;
+
+  if(8 - acc == 0) {
+    numDigit = 1;
+  } else {
+    numDigit = 8 - acc;
+  }
+  
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -294,15 +300,15 @@ void printError() {
   lc.clearDisplay(0);
 
   lc.setChar(0, 4, 'E', false);
-//  delay(100);
+  //  delay(100);
   lc.setChar(0, 3, 'r', false);
-//  delay(100);
+  //  delay(100);
   lc.setChar(0, 2, 'r', false);
-//  delay(100);
+  //  delay(100);
   lc.setChar(0, 1, '0', false);
-//  delay(100);
+  //  delay(100);
   lc.setChar(0, 0, 'r', false);
-//  delay(100);
+  //  delay(100);
 }
 
 
