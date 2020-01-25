@@ -291,9 +291,10 @@ void printNumber() {
       lc.setChar(0, i, buff[temp], false);
     }
 
-    if(temp == 0) {
+    if(temp <= 0) {
       break;
     }
+    
     temp--;
   }
   Serial.println(buff);
