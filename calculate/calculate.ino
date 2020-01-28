@@ -46,6 +46,8 @@ int numDigit = 0;
 int availableDigit = 7;
 int decNumOne;
 int decAcc;
+float numTwo;
+float result;
 
 /* if an operation has been entered */
 boolean hasResult = false;
@@ -90,7 +92,7 @@ void keyListener() {
       getEqual();
       break;
     case negative:
-      isNegative = true;
+      isNegative = !isNegative;
       break;
     default:
       numKeySetter(key);
@@ -102,9 +104,6 @@ void keyListener() {
 
 // Adding the values inputed from the user
 void numKeySetter(char i) {
-  //  if (i == '0' && buff == '0) {
-  //    return;
-  //  }
   // AHHHHHHH i can't explain this in words sooo yeahhhh.....
   if (hasResult && oper == none) {
     reset();
@@ -126,6 +125,7 @@ void numKeySetter(char i) {
     decNumOne = decAcc;
     decAcc = 0;
     hasDecimal = false;
+    isNegative = false;
     lc.clearDisplay(0);
     Serial.println(numOne);
   }
@@ -153,8 +153,12 @@ void numKeySetter(char i) {
 // Called if the EQUAL operator has been clicked. This evaluates the buff and the number one value
 void getEqual() {
   if (oper != none) {
-    float numTwo = strtod(buff, NULL);
-    float result;
+     numTwo = strtod(buff, NULL);
+
+     if(isNegative) {
+        numTwo *= -1;
+        isNegative = false;
+     }
 
     if (oper == multiply) {
       decNumOne = decNumOne + decAcc;
@@ -199,6 +203,10 @@ void getEqual() {
     Serial.println(numDigit);
     hasResult = true;
     oper = none;
+
+    if(numDigit > 8) {
+      hasError = true;
+    }
   }
 }
 
@@ -217,6 +225,7 @@ void reset() {
   hasDecimal = false;
   hasError = false;
   hasDecimal = false;
+  isNegative = false;
   lc.clearDisplay(0);
   lc.setDigit(0, 0, 0, false);
 }
